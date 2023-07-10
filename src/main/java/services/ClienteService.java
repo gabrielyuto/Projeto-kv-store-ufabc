@@ -1,6 +1,5 @@
 package services;
 
-import clientes.Cliente;
 import clientes.Mensagem;
 
 import java.io.ObjectInputStream;
@@ -38,7 +37,7 @@ public class ClienteService {
             ObjectInputStream input = new ObjectInputStream(socket.getInputStream());
             Mensagem received = (Mensagem) input.readObject();
 
-            response.setStatus(received.getStatus());
+            response.setKey(received.getKey());
 
         } catch(Exception e){
             e.printStackTrace();

@@ -39,7 +39,15 @@ public class Inicio {
                 System.out.println(response.getStatus());
             }
             else if(menu_choice == 3){
+                String key = scanner.next();
 
+                Mensagem mensagem = new Mensagem();
+                mensagem.setKey(key);
+
+                ClienteService clienteService = new ClienteService();
+                Mensagem response = clienteService.get(mensagem);
+
+                System.out.println(response.getKey());
             }
             else {
                 System.exit(0);

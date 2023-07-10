@@ -42,26 +42,20 @@ public class ServicesDatabase {
         return response;
     }
 
-    public List<Mensagem> get(Mensagem mensagem) {
-        List<Mensagem> list = new ArrayList<>();
-
+    public Mensagem get(Mensagem mensagem) {
         try {
             preparedStatement = connection.prepareStatement("select * from kv_store where key=?");
             preparedStatement.setString(1, mensagem.getKey());
             resultSet = preparedStatement.executeQuery();
 
-            while(resultSet.next()){
-                mensagem = new Mensagem();
+            mensagem = new Mensagem();
+            mensagem.setValue(resultSet.getString("value"));
 
-                mensagem.setValue(resultSet.getString("value"));
-
-                list.add(mensagem);
-            }
         } catch(SQLException ex){
             return null;
         }
 
-        return listClientWithFile;
+        return mensagem;
     }
 
     private Connection connect(String dbname, String user, String pass) {

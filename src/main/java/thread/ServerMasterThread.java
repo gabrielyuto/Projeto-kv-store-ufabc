@@ -27,7 +27,7 @@ public class ServerMasterThread extends Thread {
                 Mensagem mensagem = (Mensagem) input.readObject();
 
                 ServicesDatabase servicesDatabase = new ServicesDatabase();
-                Mensagem response = servicesDatabase.update(mensagem);
+                Mensagem response = servicesDatabase.get(mensagem);
 
                 ObjectOutputStream output = new ObjectOutputStream(socket.getOutputStream());
                 output.writeObject(response);
