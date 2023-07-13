@@ -1,13 +1,16 @@
 package clientes;
 
 import java.io.Serializable;
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 public class Mensagem implements Serializable {
     private String key;
     private String value;
     private String status;
-    private Timestamp timestamp;
+    private LocalDateTime timestamp;
+    private String ip;
+    private int port;
+    private String request;
 
     public String getKey() {
         return key;
@@ -33,11 +36,35 @@ public class Mensagem implements Serializable {
         this.status = status;
     }
 
-    public Timestamp getTimestamp() {
+    public LocalDateTime getTimestamp() {
         return timestamp;
     }
 
-    public void setTimestamp(Timestamp timestamp) {
+    public void setTimestamp(LocalDateTime timestamp) {
         this.timestamp = timestamp;
+    }
+
+    public String getIp() {
+        return ip;
+    }
+
+    public void setIp(String ip) {
+        this.ip = ip;
+    }
+
+    public int getPort() {
+        return port;
+    }
+
+    public void setPort(int port) {
+        this.port = port;
+    }
+
+    public String getRequest() {
+        return request;
+    }
+
+    public void setRequest(String request) {
+        this.request = request;
     }
 }
