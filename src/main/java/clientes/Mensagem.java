@@ -4,13 +4,28 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 
 public class Mensagem implements Serializable {
+    private String request;
     private String key;
     private String value;
     private String status;
-    private LocalDateTime timestamp;
-    private String ip;
-    private int port;
-    private String request;
+    private LocalDateTime timestampServer;
+    private LocalDateTime timestampClient;
+    private String table;
+    private String replication;
+
+    private String ipClient;
+    private int portClient;
+
+    private String ipServer;
+    private int portServer;
+
+    public String getRequest() {
+        return request;
+    }
+
+    public void setRequest(String request) {
+        this.request = request;
+    }
 
     public String getKey() {
         return key;
@@ -36,35 +51,67 @@ public class Mensagem implements Serializable {
         this.status = status;
     }
 
-    public LocalDateTime getTimestamp() {
-        return timestamp;
+    public LocalDateTime getTimestampServer() {
+        return timestampServer;
     }
 
-    public void setTimestamp(LocalDateTime timestamp) {
-        this.timestamp = timestamp;
+    public void setTimestampServer(LocalDateTime timestampServer) {
+        this.timestampServer = timestampServer;
     }
 
-    public String getIp() {
-        return ip;
+    public LocalDateTime getTimestampClient() {
+        return timestampClient;
     }
 
-    public void setIp(String ip) {
-        this.ip = ip;
+    public void setTimestampClient(LocalDateTime timestampClient) {
+        this.timestampClient = timestampClient;
     }
 
-    public int getPort() {
-        return port;
+    public String getTable() {
+        return table;
     }
 
-    public void setPort(int port) {
-        this.port = port;
+    public void setTable(String table) {
+        this.table = table;
     }
 
-    public String getRequest() {
-        return request;
+    public String getReplication() {
+        return replication;
     }
 
-    public void setRequest(String request) {
-        this.request = request;
+    public void setReplication(String replication) {
+        this.replication = replication;
+    }
+
+    public String getIpClient() {
+        return ipClient;
+    }
+
+    public void setIpClient(String ipClient) {
+        this.ipClient = ipClient;
+    }
+
+    public int getPortClient() {
+        return portClient;
+    }
+
+    public void setPortClient(int portClient) {
+        this.portClient = portClient;
+    }
+
+    public String getIpServer() {
+        return ipServer;
+    }
+
+    public void setIpServer(String ipServer) {
+        this.ipServer = ipServer;
+    }
+
+    public int getPortServer() {
+        return portServer;
+    }
+
+    public void setPortServer(int portServer) {
+        this.portServer = portServer;
     }
 }
