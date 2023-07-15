@@ -12,12 +12,14 @@ public class Mensagem implements Serializable {
     private LocalDateTime timestampClient;
     private String table;
     private String replication;
-
     private String ipClient;
+    private String ipServerClientRequest;
+    private String ipServerMaster;
+    private String ipServerOthers;
     private int portClient;
-
-    private String ipServer;
-    private int portServer;
+    private int portServerClientRequest;
+    private int portServerMaster;
+    private int portServerOthers;
 
     public String getRequest() {
         return request;
@@ -91,6 +93,30 @@ public class Mensagem implements Serializable {
         this.ipClient = ipClient;
     }
 
+    public String getIpServerClientRequest() {
+        return ipServerClientRequest;
+    }
+
+    public void setIpServerClientRequest(String ipServerClientRequest) {
+        this.ipServerClientRequest = ipServerClientRequest;
+    }
+
+    public String getIpServerMaster() {
+        return ipServerMaster;
+    }
+
+    public void setIpServerMaster(String ipServerMaster) {
+        this.ipServerMaster = ipServerMaster;
+    }
+
+    public String getIpServerOthers() {
+        return ipServerOthers;
+    }
+
+    public void setIpServerOthers(String ipServerOthers) {
+        this.ipServerOthers = ipServerOthers;
+    }
+
     public int getPortClient() {
         return portClient;
     }
@@ -99,19 +125,27 @@ public class Mensagem implements Serializable {
         this.portClient = portClient;
     }
 
-    public String getIpServer() {
-        return ipServer;
+    public int getPortServerClientRequest() {
+        return portServerClientRequest;
     }
 
-    public void setIpServer(String ipServer) {
-        this.ipServer = ipServer;
+    public void setPortServerClientRequest(int portServerClientRequest) {
+        this.portServerClientRequest = portServerClientRequest;
     }
 
-    public int getPortServer() {
-        return portServer;
+    public int getPortServerMaster() {
+        return portServerMaster;
     }
 
-    public void setPortServer(int portServer) {
-        this.portServer = portServer;
+    public void setPortServerMaster(int portServerMaster) {
+        this.portServerMaster = portServerMaster;
+    }
+
+    public int getPortServerOthers() {
+        return portServerOthers;
+    }
+
+    public void setPortServerOthers(int portServerOthers) {
+        this.portServerOthers = portServerOthers;
     }
 }
