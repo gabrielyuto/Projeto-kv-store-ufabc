@@ -53,7 +53,7 @@ public class Cliente {
 //                    mensagem.setIpClient(ipClient);
 //                    mensagem.setPortClient(portClient);
                     mensagem.setIpServerClientRequest("localhost");
-                    mensagem.setPortServerClientRequest(10098);
+                    mensagem.setPortServerClientRequest(10097);
                     break;
 
                 case 2:
@@ -128,9 +128,10 @@ public class Cliente {
 
     private static Mensagem update(Mensagem mensagem){
         try{
-            Socket socket = new Socket("localhost", mensagem.getPortServerClientRequest());
+            Socket socket = new Socket(mensagem.getIpServerClientRequest(), mensagem.getPortServerClientRequest());
             ObjectOutputStream output = new ObjectOutputStream(socket.getOutputStream());
             output.writeObject(mensagem);
+            output.flush();
 
             ObjectInputStream input = new ObjectInputStream(socket.getInputStream());
             return (Mensagem) input.readObject();

@@ -10,17 +10,16 @@ import java.net.Socket;
 import java.util.Optional;
 
 public class ThreadServidorUm implements Runnable {
-    private final Socket clientSocket;
     private final String tableMaster = "servidor_mestre";
     private final String tableOne = "servidor_um";
+    private final Socket socket;
     private Mensagem mensagem;
     private Mensagem response;
     private Optional<Mensagem> optionalResponse;
 
-
-    public ThreadServidorUm(Socket clientSocket, Mensagem mensagem){
-        this.clientSocket = clientSocket;
+    public ThreadServidorUm(Socket socket, Mensagem mensagem){
         this.mensagem = mensagem;
+        this.socket = socket;
     }
 
     @Override
@@ -32,19 +31,7 @@ public class ThreadServidorUm implements Runnable {
                         "Encaminhando PUT key:" + mensagem.getKey() + " value:" + mensagem.getValue()
                     );
 
-                    optionalResponse = put(mensagem);
-
-                    if(optionalResponse.isPresent()){
-                        Optional<Mensagem> retorno = insertLocal(optionalResponse.get());
-                        if(retorno.get().getRequest().equals("REPLICATION_OK")){
-                            response = retorno.get();
-                        }
-                    } else {
-                        response = null;
-                    }
-
-                    sendBackToClient(response);
-
+                    resend(mensagem);
                     break;
                 case "GET":
                     optionalResponse = get(mensagem);
@@ -67,25 +54,28 @@ public class ThreadServidorUm implements Runnable {
 
                     break;
                 case "REPLICATION":
-                    break;
-                case "REPLICATION_OK":
+                    insertLocal(mensagem);
+
+                    Mensagem resposta = sendToServerMaster(mensagem);
+                    sendBackToClient(resposta);
+
+                    mensagem.setRequest("REPLICATION_OK");
+
+                    sendToServerMaster(mensagem);
                     break;
             }
-        } catch (IOException ex) {
+        } catch (IOException | ClassNotFoundException ex) {
             throw new RuntimeException(ex);
         }
     }
 
-    private Optional<Mensagem> put(Mensagem mensagem) {
+    private void resend(Mensagem mensagem) {
         try{
             mensagem.setRequest("REPLICATION");
 
-            Optional<Mensagem> response = sendToServerMaster(mensagem);
-
-            return response;
-
+            sendToServerMaster(mensagem);
         } catch (Exception e) {
-            return Optional.empty();
+            e.printStackTrace();
         }
     }
 
@@ -101,7 +91,7 @@ public class ThreadServidorUm implements Runnable {
         }
     }
 
-    private Optional<Mensagem> insertLocal(Mensagem mensagem){
+    private void insertLocal(Mensagem mensagem){
         try{
             ServicesDatabase servicesDatabase = new ServicesDatabase();
 
@@ -109,28 +99,31 @@ public class ThreadServidorUm implements Runnable {
 
             mensagem.setRequest("REPLICATION_OK");
 
-            Optional<Mensagem> response = sendToServerMaster(mensagem);
-
-            return response;
+            sendToServerMaster(mensagem);
         } catch(Exception e){
-            return Optional.empty();
+            e.printStackTrace();
         }
     }
 
     private void sendBackToClient(Mensagem response) throws IOException {
-        ObjectOutputStream output = new ObjectOutputStream(clientSocket.getOutputStream());
+        ObjectOutputStream output = new ObjectOutputStream(socket.getOutputStream());
         output.writeObject(response);
     }
 
-    private Optional<Mensagem> sendToServerMaster(Mensagem mensagem) throws IOException, ClassNotFoundException {
-        Socket socket = new Socket(mensagem.getIpServerMaster(), mensagem.getPortServerMaster());
+    private Mensagem sendToServerMaster(Mensagem mensagem) throws IOException, ClassNotFoundException {
+        try{
+            Socket socketServerMaster = new Socket(mensagem.getIpServerMaster(), mensagem.getPortServerMaster());
 
-        ObjectOutputStream output = new ObjectOutputStream(socket.getOutputStream());
-        output.writeObject(mensagem);
+            ObjectOutputStream output = new ObjectOutputStream(socketServerMaster.getOutputStream());
+            output.writeObject(mensagem);
+            output.flush();
 
-        ObjectInputStream input = new ObjectInputStream(socket.getInputStream());
-        response = (Mensagem) input.readObject();
+            ObjectInputStream input = new ObjectInputStream(socketServerMaster.getInputStream());
+            Mensagem response = (Mensagem) input.readObject();
 
-        return Optional.of(response);
+            return response;
+        } catch (Exception ex){
+            return null;
+        }
     }
 }

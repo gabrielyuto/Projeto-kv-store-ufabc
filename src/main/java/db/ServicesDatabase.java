@@ -105,6 +105,8 @@ public class ServicesDatabase {
                 retorno.setPortServerMaster(mensagem.getPortServerMaster());
                 retorno.setIpServerOthers(mensagem.getIpServerOthers());
                 retorno.setPortServerOthers(mensagem.getPortServerOthers());
+                retorno.setIpClient(mensagem.getIpClient());
+                retorno.setPortClient(mensagem.getPortClient());
                 retorno.setStatus("PUT_OK");
 
                 resultados.add(retorno);
@@ -167,6 +169,8 @@ public class ServicesDatabase {
                 retorno.setPortServerMaster(mensagem.getPortServerMaster());
                 retorno.setIpServerOthers(mensagem.getIpServerOthers());
                 retorno.setPortServerOthers(mensagem.getPortServerOthers());
+                retorno.setIpClient(mensagem.getIpClient());
+                retorno.setPortClient(mensagem.getPortClient());
                 retorno.setTimestampClient(mensagem.getTimestampClient());
                 retorno.setTimestampServer(resultSet.getTimestamp("timestamp").toLocalDateTime());
                 retorno.setStatus("PUT_OK");

@@ -35,6 +35,8 @@ public class ServidorMestre {
 
                 Thread thread = new Thread(new ThreadServidorMestre(socket, mensagem));
                 thread.start();
+
+                input.close();
             }
         } catch (Exception e) {
             e.printStackTrace();

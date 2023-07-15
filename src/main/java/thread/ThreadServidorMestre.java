@@ -9,15 +9,15 @@ import java.net.Socket;
 import java.util.Optional;
 
 public class ThreadServidorMestre implements Runnable {
-    private final Socket clientSocket;
+    private final Socket socket;
     private Mensagem mensagem;
     private Mensagem response;
     private Optional<Mensagem> optionalResponse;
     private final String table = "servidor_mestre";
 
-    public ThreadServidorMestre(Socket clientSocket, Mensagem mensagem){
-        this.clientSocket = clientSocket;
+    public ThreadServidorMestre(Socket socket, Mensagem mensagem){
         this.mensagem = mensagem;
+        this.socket = socket;
     }
 
     @Override
@@ -39,7 +39,7 @@ public class ThreadServidorMestre implements Runnable {
                         response = null;
                     }
 
-                    sendBackToClient(response);
+                    sendBack(response);
 
                     break;
                 case "GET":
@@ -59,7 +59,7 @@ public class ThreadServidorMestre implements Runnable {
                         response = null;
                     }
 
-                    sendBackToClient(response);
+                    sendBack(response);
 
                     break;
 
@@ -74,13 +74,14 @@ public class ThreadServidorMestre implements Runnable {
                         response = null;
                     }
 
-                    sendBackResponseUpdateToServer(response);
+                    response.setRequest("REPLICATION");
+                    sendBack(response);
 
                     break;
                 case "REPLICATION_OK":
                     mensagem.setRequest("REPLICATION_OK");
 
-                    sendBackResponseUpdateToServer(mensagem);
+                    sendBack(mensagem);
 
                     System.out.println("REPLICATION_OK");
                     break;
@@ -96,7 +97,6 @@ public class ThreadServidorMestre implements Runnable {
         Optional<Mensagem> response;
 
         try{
-
             ServicesDatabase servicesDatabase = new ServicesDatabase();
 
             findRegistry = servicesDatabase.get(mensagem, table);
@@ -127,18 +127,14 @@ public class ThreadServidorMestre implements Runnable {
         }
     }
 
-    private void sendBackToClient(Mensagem response) throws IOException {
-        ObjectOutputStream output = new ObjectOutputStream(clientSocket.getOutputStream());
-        output.writeObject(response);
-    }
-
-    private void sendBackResponseUpdateToServer(Mensagem mensagem) {
+    private void sendBack(Mensagem response) throws IOException {
         try{
-            Socket socketServerOther = new Socket(mensagem.getIpServerOthers(), mensagem.getPortServerOthers());
+            ObjectOutputStream output = new ObjectOutputStream(socket.getOutputStream());
+            output.writeObject(response);
+            output.flush();
 
-            ObjectOutputStream output = new ObjectOutputStream(socketServerOther.getOutputStream());
-            output.writeObject(mensagem);
-
+            output.close();
+            socket.close();
         } catch(Exception e){
             e.printStackTrace();
         }
