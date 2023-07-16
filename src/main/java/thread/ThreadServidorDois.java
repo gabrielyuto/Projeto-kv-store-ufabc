@@ -11,7 +11,7 @@ import java.util.Optional;
 
 public class ThreadServidorDois implements Runnable {
     private final String tableMaster = "servidor_mestre";
-    private final String tableOne = "servidor_um";
+    private final String tableTwo = "servidor_dois";
     private final Socket socket;
     private Mensagem mensagem;
     private Mensagem response;
@@ -102,7 +102,7 @@ public class ThreadServidorDois implements Runnable {
         try{
             ServicesDatabase servicesDatabase = new ServicesDatabase();
 
-            servicesDatabase.insertLocal(mensagem, tableOne);
+            servicesDatabase.insertLocal(mensagem, tableTwo);
 
         } catch(Exception e){
             e.printStackTrace();
