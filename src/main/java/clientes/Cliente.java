@@ -5,6 +5,7 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.time.LocalDateTime;
 import java.util.Optional;
+import java.util.Random;
 import java.util.Scanner;
 
 public class Cliente {
@@ -14,8 +15,8 @@ public class Cliente {
         Optional<Mensagem> response;
         Optional<String> valueReturned;
 
-        String ipClient, ip1, ip2, ip3, key, value;
-        int portClient, port1, port2, port3;
+        String ip, ip1, ip2, ip3, key, value;
+        int port, port1, port2, port3;
 
         while(true) {
             System.out.println("1-INIT | 2-GET | 3-PUT");
@@ -24,36 +25,33 @@ public class Cliente {
 
             switch (menu_choice) {
                 case 1:
+                    System.out.println("IP Servidor 1: ");
+                    ip1 = scanner.next();
+                    System.out.println("PORT Servidor 1: ");
+                    port1 = scanner.nextInt();
 
-                System.out.println("IP Servidor 1: ");
-                ip1 = scanner.next();
-                System.out.println("PORT Servidor 1: ");
-                port1 = scanner.nextInt();
+                    System.out.println("IP Servidor 2: ");
+                    ip2 = scanner.next();
+                    System.out.println("PORT Servidor 2: ");
+                    port2 = scanner.nextInt();
 
-//                System.out.println("IP Servidor 2: ");
-//                ip2 = scanner.next();
-//                System.out.println("PORT Servidor 2: ");
-//                port2 = scanner.nextInt();
+                    System.out.println("IP Servidor 3: ");
+                    ip3 = scanner.next();
+                    System.out.println("PORT Servidor 3: ");
+                    port3 = scanner.nextInt();
 
-//                System.out.println("IP Servidor 3: ");
-//                ip3 = scanner.next();
-//                System.out.println("PORT Servidor 3: ");
-//                port3 = scanner.nextInt();
+                    String[] ips = {ip1,ip2, ip3};
+                    int[] ports = {port1,port2, port3};
 
-//                String[] ips = {ip1,ip2, ip3};
-//                int[] ports = {port1,port2, port3};
-//
-//                Random random = new Random();
-//                int indiceAleatorio = random.nextInt(ports.length);
-//                ip = ips[indiceAleatorio];
-//                port = ports[indiceAleatorio];
+                    Random random = new Random();
+                    int indiceAleatorio = random.nextInt(ports.length);
+                    ip = ips[indiceAleatorio];
+                    port = ports[indiceAleatorio];
 
-//                    mensagem.setIpClient(ipClient);
-//                    mensagem.setPortClient(portClient);
-                    mensagem.setIpServerClientRequest(ip1);
-                    mensagem.setPortServerClientRequest(port1);
+                    mensagem.setIpServerClientRequest(ip);
+                    mensagem.setPortServerClientRequest(port);
+
                     break;
-
                 case 2:
                     key = scanner.next();
 
