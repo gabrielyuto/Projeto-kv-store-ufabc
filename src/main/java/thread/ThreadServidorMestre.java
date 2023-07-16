@@ -4,6 +4,7 @@ import clientes.Mensagem;
 import db.ServicesDatabase;
 
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.Optional;
@@ -26,7 +27,7 @@ public class ThreadServidorMestre implements Runnable {
             switch (mensagem.getRequest()) {
                 case "PUT":
                     System.out.println(
-                            "Cliente " + mensagem.getIpClient() + ":" + mensagem.getPortClient()
+                            "Cliente " + mensagem.getIpFrom() + ":" + mensagem.getPortFrom()
                             + " PUT key:" + mensagem.getKey()
                             + " value:" + mensagem.getValue()
                     );
@@ -36,27 +37,35 @@ public class ThreadServidorMestre implements Runnable {
                     if(optionalResponse.isPresent()){
                         response = optionalResponse.get();
                     } else {
-                        response = null;
+                        response = new Mensagem();
                     }
 
                     sendBack(response);
+
+                    response.setRequest("REPLICATION");
+                    sendToOtherServers(response, mensagem.getIpServerOne(), mensagem.getPortServerOne());
+//                    sendToOtherServers(response, mensagem.getIpServerTwo(), mensagem.getPortServerTwo());
 
                     break;
                 case "GET":
                     optionalResponse = get(mensagem);
 
                     if(optionalResponse.isPresent()){
-                        response = optionalResponse.get();
+                        if(optionalResponse.get().getStatus().equals("TRY_OTHER_SERVER_OR_LATER")){
+                            response = new Mensagem();
+                        } else {
+                            response = optionalResponse.get();
 
-                        System.out.println(
-                                "Cliente " + response.getIpClient() + ":" + response.getPortClient()
-                                        + " GET key:" + response.getKey()
-                                        + "ts:" + response.getTimestampClient()
-                                        + ". Meu ts é " + response.getTimestampServer()
-                                        + ", portanto devolvendo " + response.getValue()
-                        );
+                            System.out.println(
+                                    "Cliente " + response.getIpFrom() + ":" + response.getPortFrom()
+                                            + " GET key:" + response.getKey()
+                                            + " ts:" + response.getTimestampClient()
+                                            + ". Meu ts é " + response.getTimestampServer()
+                                            + ", portanto devolvendo " + response.getValue()
+                            );
+                        }
                     } else {
-                        response = null;
+                        response = new Mensagem();
                     }
 
                     sendBack(response);
@@ -64,30 +73,27 @@ public class ThreadServidorMestre implements Runnable {
                     break;
 
                 case "REPLICATION":
-                    System.out.println("Replicação: ");
-
                     optionalResponse = put(mensagem);
 
                     if(optionalResponse.isPresent()){
                         response = optionalResponse.get();
                     } else {
-                        response = null;
+                        response = new Mensagem();
                     }
 
-                    response.setRequest("REPLICATION");
+                    response.setRequest("REPLICATION_OK");
+
                     sendBack(response);
+
+                    System.out.println("REPLICATION_OK");
 
                     break;
                 case "REPLICATION_OK":
-                    mensagem.setRequest("REPLICATION_OK");
-
-                    sendBack(mensagem);
-
                     System.out.println("REPLICATION_OK");
                     break;
             }
 
-        } catch (IOException ex) {
+        } catch (IOException | ClassNotFoundException ex) {
             throw new RuntimeException(ex);
         }
     }
@@ -121,6 +127,14 @@ public class ThreadServidorMestre implements Runnable {
 
             response = servicesDatabase.get(mensagem, table);
 
+            if(response.get().getTimestampServer().isAfter(response.get().getTimestampClient()) ||
+               response.get().getTimestampServer().isEqual(response.get().getTimestampClient())) {
+                response.get().setStatus("TRY_OTHER_SERVER_OR_LATER");
+            } else {
+                response.get().setStatus("OK");
+            }
+
+
             return response;
         } catch (Exception e){
             return Optional.empty();
@@ -131,12 +145,24 @@ public class ThreadServidorMestre implements Runnable {
         try{
             ObjectOutputStream output = new ObjectOutputStream(socket.getOutputStream());
             output.writeObject(response);
-            output.flush();
-
-            output.close();
-            socket.close();
         } catch(Exception e){
             e.printStackTrace();
+        }
+    }
+
+    private Mensagem sendToOtherServers(Mensagem mensagem, String ip, int port) throws IOException, ClassNotFoundException {
+        try{
+            Socket socketServerMaster = new Socket(ip, port);
+
+            ObjectOutputStream output = new ObjectOutputStream(socketServerMaster.getOutputStream());
+            output.writeObject(mensagem);
+
+            ObjectInputStream input = new ObjectInputStream(socketServerMaster.getInputStream());
+            Mensagem response = (Mensagem) input.readObject();
+
+            return response;
+        } catch (Exception ex){
+            return null;
         }
     }
 }

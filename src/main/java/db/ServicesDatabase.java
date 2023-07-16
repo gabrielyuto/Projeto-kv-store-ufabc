@@ -38,12 +38,14 @@ public class ServicesDatabase {
             while(resultSet.next()){
                 retorno.setKey(resultSet.getString("key"));
                 retorno.setValue(resultSet.getString("value"));
-                retorno.setIpClient(mensagem.getIpClient());
-                retorno.setPortClient(mensagem.getPortClient());
+                retorno.setIpFrom(mensagem.getIpFrom());
+                retorno.setPortFrom(mensagem.getPortFrom());
                 retorno.setIpServerMaster(mensagem.getIpServerMaster());
                 retorno.setPortServerMaster(mensagem.getPortServerMaster());
-                retorno.setIpServerOthers(mensagem.getIpServerOthers());
-                retorno.setPortServerOthers(mensagem.getPortServerOthers());
+                retorno.setIpServerOne(mensagem.getIpServerOne());
+                retorno.setPortServerOne(mensagem.getPortServerOne());
+                retorno.setIpServerTwo(mensagem.getIpServerTwo());
+                retorno.setPortServerTwo(mensagem.getPortServerTwo());
                 retorno.setTimestampClient(mensagem.getTimestampClient());
                 retorno.setTimestampServer(resultSet.getTimestamp("timestamp").toLocalDateTime());
 
@@ -79,7 +81,6 @@ public class ServicesDatabase {
             preparedStatement.setTimestamp(3, Timestamp.valueOf(time));
             preparedStatement.executeUpdate();
 
-
             switch (table) {
                 case "servidor_mestre":
                     preparedStatement = connection.prepareStatement("select * from servidor_mestre where key=?");
@@ -103,10 +104,12 @@ public class ServicesDatabase {
                 retorno.setTimestampServer(resultSet.getTimestamp("timestamp").toLocalDateTime());
                 retorno.setIpServerMaster(mensagem.getIpServerMaster());
                 retorno.setPortServerMaster(mensagem.getPortServerMaster());
-                retorno.setIpServerOthers(mensagem.getIpServerOthers());
-                retorno.setPortServerOthers(mensagem.getPortServerOthers());
-                retorno.setIpClient(mensagem.getIpClient());
-                retorno.setPortClient(mensagem.getPortClient());
+                retorno.setIpServerOne(mensagem.getIpServerOne());
+                retorno.setPortServerOne(mensagem.getPortServerOne());
+                retorno.setIpServerTwo(mensagem.getIpServerTwo());
+                retorno.setPortServerTwo(mensagem.getPortServerTwo());
+                retorno.setIpFrom(mensagem.getIpFrom());
+                retorno.setPortFrom(mensagem.getPortFrom());
                 retorno.setStatus("PUT_OK");
 
                 resultados.add(retorno);
@@ -167,10 +170,12 @@ public class ServicesDatabase {
                 retorno.setValue(resultSet.getString("value"));
                 retorno.setIpServerMaster(mensagem.getIpServerMaster());
                 retorno.setPortServerMaster(mensagem.getPortServerMaster());
-                retorno.setIpServerOthers(mensagem.getIpServerOthers());
-                retorno.setPortServerOthers(mensagem.getPortServerOthers());
-                retorno.setIpClient(mensagem.getIpClient());
-                retorno.setPortClient(mensagem.getPortClient());
+                retorno.setIpServerOne(mensagem.getIpServerOne());
+                retorno.setPortServerOne(mensagem.getPortServerOne());
+                retorno.setIpServerTwo(mensagem.getIpServerTwo());
+                retorno.setPortServerTwo(mensagem.getPortServerTwo());
+                retorno.setIpFrom(mensagem.getIpFrom());
+                retorno.setPortFrom(mensagem.getPortFrom());
                 retorno.setTimestampClient(mensagem.getTimestampClient());
                 retorno.setTimestampServer(resultSet.getTimestamp("timestamp").toLocalDateTime());
                 retorno.setStatus("PUT_OK");
@@ -190,13 +195,10 @@ public class ServicesDatabase {
         try{
             connection = connect();
 
-            switch (table) {
-                case "servidor_um":
-                    preparedStatement = connection.prepareStatement("insert into servidor_um (key, value, timestamp) values(?,?,?)");
-                    break;
-                case "servidor_dois":
-                    preparedStatement = connection.prepareStatement("insert into servidor_dois (key, value, timestamp) values(?,?,?)");
-                    break;
+            if (table.equals("servidor_um")) {
+                preparedStatement = connection.prepareStatement("insert into servidor_um (key, value, timestamp) values(?,?,?)");
+            } else if (table.equals("servido_dois")){
+                preparedStatement = connection.prepareStatement("insert into servidor_dois (key, value, timestamp) values(?,?,?)");
             }
 
             preparedStatement.setString(1, mensagem.getKey());

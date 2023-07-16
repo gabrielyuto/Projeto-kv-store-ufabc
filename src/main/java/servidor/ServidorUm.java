@@ -36,23 +36,17 @@ public class ServidorUm {
                 ObjectInputStream input = new ObjectInputStream(socket.getInputStream());
                 Mensagem mensagem = (Mensagem) input.readObject();
 
-                if(mensagem.getRequest().equals("PUT") || mensagem.getRequest().equals("GET")){
-                    String ipClient = socket.getInetAddress().getHostAddress();
-                    int portClient = socket.getPort();
+                String ipFrom = socket.getInetAddress().getHostAddress();
+                int portFrom = socket.getPort();
 
-                    mensagem.setIpClient(ipClient);
-                    mensagem.setPortClient(portClient);
-                }
+                mensagem.setIpFrom(ipFrom);
+                mensagem.setPortFrom(portFrom);
 
-                mensagem.setIpServerOthers(ip);
-                mensagem.setPortServerOthers(port);
                 mensagem.setIpServerMaster(ipServerMaster);
                 mensagem.setPortServerMaster(portServerMaster);
 
                 Thread thread = new Thread(new ThreadServidorUm(socket, mensagem));
                 thread.start();
-
-                input.close();
             }
         } catch (Exception e) {
             e.printStackTrace();

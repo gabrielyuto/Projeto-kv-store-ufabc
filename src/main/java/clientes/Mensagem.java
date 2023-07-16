@@ -12,14 +12,16 @@ public class Mensagem implements Serializable {
     private LocalDateTime timestampClient;
     private String table;
     private String replication;
-    private String ipClient;
+    private String ipFrom;
     private String ipServerClientRequest;
     private String ipServerMaster;
-    private String ipServerOthers;
-    private int portClient;
+    private String ipServerOne;
+    private String ipServerTwo;
+    private int portFrom;
     private int portServerClientRequest;
     private int portServerMaster;
-    private int portServerOthers;
+    private int portServerOne;
+    private int portServerTwo;
 
     public String getRequest() {
         return request;
@@ -85,12 +87,12 @@ public class Mensagem implements Serializable {
         this.replication = replication;
     }
 
-    public String getIpClient() {
-        return ipClient;
+    public String getIpFrom() {
+        return ipFrom;
     }
 
-    public void setIpClient(String ipClient) {
-        this.ipClient = ipClient;
+    public void setIpFrom(String ipFrom) {
+        this.ipFrom = ipFrom;
     }
 
     public String getIpServerClientRequest() {
@@ -109,20 +111,28 @@ public class Mensagem implements Serializable {
         this.ipServerMaster = ipServerMaster;
     }
 
-    public String getIpServerOthers() {
-        return ipServerOthers;
+    public String getIpServerOne() {
+        return ipServerOne;
     }
 
-    public void setIpServerOthers(String ipServerOthers) {
-        this.ipServerOthers = ipServerOthers;
+    public void setIpServerOne(String ipServerOne) {
+        this.ipServerOne = ipServerOne;
     }
 
-    public int getPortClient() {
-        return portClient;
+    public String getIpServerTwo() {
+        return ipServerTwo;
     }
 
-    public void setPortClient(int portClient) {
-        this.portClient = portClient;
+    public void setIpServerTwo(String ipServerTwo) {
+        this.ipServerTwo = ipServerTwo;
+    }
+
+    public int getPortFrom() {
+        return portFrom;
+    }
+
+    public void setPortFrom(int portFrom) {
+        this.portFrom = portFrom;
     }
 
     public int getPortServerClientRequest() {
@@ -141,11 +151,19 @@ public class Mensagem implements Serializable {
         this.portServerMaster = portServerMaster;
     }
 
-    public int getPortServerOthers() {
-        return portServerOthers;
+    public int getPortServerOne() {
+        return portServerOne;
     }
 
-    public void setPortServerOthers(int portServerOthers) {
-        this.portServerOthers = portServerOthers;
+    public void setPortServerOne(int portServerOne) {
+        this.portServerOne = portServerOne;
+    }
+
+    public int getPortServerTwo() {
+        return portServerTwo;
+    }
+
+    public void setPortServerTwo(int portServerTwo) {
+        this.portServerTwo = portServerTwo;
     }
 }

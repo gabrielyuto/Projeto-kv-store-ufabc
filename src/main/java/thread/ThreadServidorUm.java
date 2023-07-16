@@ -26,56 +26,56 @@ public class ThreadServidorUm implements Runnable {
     public void run() {
         try{
             switch (mensagem.getRequest()) {
-                case "PUT":
-                    System.out.println(
-                        "Encaminhando PUT key:" + mensagem.getKey() + " value:" + mensagem.getValue()
-                    );
-
-                    resend(mensagem);
-                    break;
                 case "GET":
                     optionalResponse = get(mensagem);
 
                     if(optionalResponse.isPresent()){
-                        response = optionalResponse.get();
+                        if(optionalResponse.get().getStatus().equals("TRY_OTHER_SERVER_OR_LATER")){
+                            response = new Mensagem();
+                        } else {
+                            response = optionalResponse.get();
 
-                        System.out.println(
-                                "Cliente " + response.getIpClient() + ":" + response.getPortClient()
-                                        + " GET key:" + response.getKey()
-                                        + "ts:" + response.getTimestampClient()
-                                        + ". Meu ts é " + response.getTimestampServer()
-                                        + ", portanto devolvendo " + response.getValue()
-                        );
+                            System.out.println(
+                                    "Cliente " + response.getIpFrom() + ":" + response.getPortFrom()
+                                            + " GET key:" + response.getKey()
+                                            + " ts:" + response.getTimestampClient()
+                                            + ". Meu ts é " + response.getTimestampServer()
+                                            + ", portanto devolvendo " + response.getValue()
+                            );
+                        }
                     } else {
-                        response = null;
+                        response = new Mensagem();
                     }
 
-                    sendBackToClient(response);
+                    sendBack(response);
+
+                    break;
+                case "PUT":
+                    System.out.println(
+                            "Encaminhando PUT key:" + mensagem.getKey() + " value:" + mensagem.getValue()
+                    );
+
+                    mensagem.setRequest("REPLICATION");
+
+                    response = sendToServerMaster(mensagem);
+
+                    insertLocal(response);
+
+                    sendBack(response);
 
                     break;
                 case "REPLICATION":
+                    System.out.println("Replication OK");
                     insertLocal(mensagem);
-
-                    Mensagem resposta = sendToServerMaster(mensagem);
-                    sendBackToClient(resposta);
 
                     mensagem.setRequest("REPLICATION_OK");
 
-                    sendToServerMaster(mensagem);
+                    sendBack(mensagem);
+
                     break;
             }
         } catch (IOException | ClassNotFoundException ex) {
             throw new RuntimeException(ex);
-        }
-    }
-
-    private void resend(Mensagem mensagem) {
-        try{
-            mensagem.setRequest("REPLICATION");
-
-            sendToServerMaster(mensagem);
-        } catch (Exception e) {
-            e.printStackTrace();
         }
     }
 
@@ -84,6 +84,13 @@ public class ThreadServidorUm implements Runnable {
             ServicesDatabase servicesDatabase = new ServicesDatabase();
 
             Optional<Mensagem> response = servicesDatabase.get(mensagem, tableMaster);
+
+            if(response.get().getTimestampServer().isAfter(response.get().getTimestampClient()) ||
+                    response.get().getTimestampServer().isEqual(response.get().getTimestampClient())) {
+                response.get().setStatus("TRY_OTHER_SERVER_OR_LATER");
+            } else {
+                response.get().setStatus("OK");
+            }
 
             return response;
         } catch (Exception e){
@@ -97,15 +104,12 @@ public class ThreadServidorUm implements Runnable {
 
             servicesDatabase.insertLocal(mensagem, tableOne);
 
-            mensagem.setRequest("REPLICATION_OK");
-
-            sendToServerMaster(mensagem);
         } catch(Exception e){
             e.printStackTrace();
         }
     }
 
-    private void sendBackToClient(Mensagem response) throws IOException {
+    private void sendBack(Mensagem response) throws IOException {
         ObjectOutputStream output = new ObjectOutputStream(socket.getOutputStream());
         output.writeObject(response);
     }
@@ -116,7 +120,6 @@ public class ThreadServidorUm implements Runnable {
 
             ObjectOutputStream output = new ObjectOutputStream(socketServerMaster.getOutputStream());
             output.writeObject(mensagem);
-            output.flush();
 
             ObjectInputStream input = new ObjectInputStream(socketServerMaster.getInputStream());
             Mensagem response = (Mensagem) input.readObject();
