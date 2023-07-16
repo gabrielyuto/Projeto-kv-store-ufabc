@@ -44,7 +44,7 @@ public class ThreadServidorMestre implements Runnable {
 
                     response.setRequest("REPLICATION");
                     sendToOtherServers(response, mensagem.getIpServerOne(), mensagem.getPortServerOne());
-//                    sendToOtherServers(response, mensagem.getIpServerTwo(), mensagem.getPortServerTwo());
+                    sendToOtherServers(response, mensagem.getIpServerTwo(), mensagem.getPortServerTwo());
 
                     break;
                 case "GET":
