@@ -9,207 +9,8 @@ import java.util.List;
 import java.util.Optional;
 
 public class ServicesDatabase {
-    private Connection connection;
     private PreparedStatement preparedStatement;
-
-    public Optional<Mensagem> get(Mensagem mensagem, String table) {
-        try {
-            Mensagem retorno = new Mensagem();
-
-            connection = connect();
-
-            switch (table) {
-                case "servidor_mestre":
-                    preparedStatement = connection.prepareStatement("select * from servidor_mestre where key=?");
-                    break;
-                case "servidor_um":
-                    preparedStatement = connection.prepareStatement("select * from servidor_um where key=?");
-                    break;
-                case "servidor_dois":
-                    preparedStatement = connection.prepareStatement("select * from servidor_dois where key=?");
-                    break;
-            }
-
-            preparedStatement.setString(1, mensagem.getKey());
-            ResultSet resultSet = preparedStatement.executeQuery();
-
-            List<Mensagem> resultados = new ArrayList<>();
-
-            while(resultSet.next()){
-                retorno.setKey(resultSet.getString("key"));
-                retorno.setValue(resultSet.getString("value"));
-                retorno.setIpFrom(mensagem.getIpFrom());
-                retorno.setPortFrom(mensagem.getPortFrom());
-                retorno.setIpServerMaster(mensagem.getIpServerMaster());
-                retorno.setPortServerMaster(mensagem.getPortServerMaster());
-                retorno.setIpServerOne(mensagem.getIpServerOne());
-                retorno.setPortServerOne(mensagem.getPortServerOne());
-                retorno.setIpServerTwo(mensagem.getIpServerTwo());
-                retorno.setPortServerTwo(mensagem.getPortServerTwo());
-                retorno.setTimestampClient(mensagem.getTimestampClient());
-                retorno.setTimestampServer(resultSet.getTimestamp("timestamp").toLocalDateTime());
-
-                resultados.add(retorno);
-            }
-
-            Optional<Mensagem> first = resultados.stream().findFirst();
-
-            return first;
-
-        } catch (SQLException e) {
-            return Optional.empty();
-        }
-    }
-
-    public Optional<Mensagem> create(Mensagem mensagem, String table) {
-        Mensagem retorno = new Mensagem();
-        LocalDateTime time = LocalDateTime.now();
-
-        try{
-            connection = connect();
-
-            if(table.equals("servidor_mestre")){
-                preparedStatement = connection.prepareStatement("insert into servidor_mestre (key, value, timestamp) values(?,?,?)");
-            } else if (table.equals("servidor_um")) {
-                preparedStatement = connection.prepareStatement("insert into servidor_um (key, value, timestamp) values(?,?,?)");
-            } else if (table.equals("servido_dois")){
-                preparedStatement = connection.prepareStatement("insert into servidor_dois (key, value, timestamp) values(?,?,?)");
-            }
-
-            preparedStatement.setString(1, mensagem.getKey());
-            preparedStatement.setString(2, mensagem.getValue());
-            preparedStatement.setTimestamp(3, Timestamp.valueOf(time));
-            preparedStatement.executeUpdate();
-
-            switch (table) {
-                case "servidor_mestre":
-                    preparedStatement = connection.prepareStatement("select * from servidor_mestre where key=?");
-                    break;
-                case "servidor_um":
-                    preparedStatement = connection.prepareStatement("select * from servidor_um where key=?");
-                    break;
-                case "servidor_dois":
-                    preparedStatement = connection.prepareStatement("select * from servidor_dois where key=?");
-                    break;
-            }
-
-            preparedStatement.setString(1, mensagem.getKey());
-            ResultSet resultSet = preparedStatement.executeQuery();
-
-            List<Mensagem> resultados = new ArrayList<>();
-
-            while(resultSet.next()) {
-                retorno.setKey(resultSet.getString("key"));
-                retorno.setValue(resultSet.getString("value"));
-                retorno.setTimestampServer(resultSet.getTimestamp("timestamp").toLocalDateTime());
-                retorno.setIpServerMaster(mensagem.getIpServerMaster());
-                retorno.setPortServerMaster(mensagem.getPortServerMaster());
-                retorno.setIpServerOne(mensagem.getIpServerOne());
-                retorno.setPortServerOne(mensagem.getPortServerOne());
-                retorno.setIpServerTwo(mensagem.getIpServerTwo());
-                retorno.setPortServerTwo(mensagem.getPortServerTwo());
-                retorno.setIpFrom(mensagem.getIpFrom());
-                retorno.setPortFrom(mensagem.getPortFrom());
-                retorno.setStatus("PUT_OK");
-
-                resultados.add(retorno);
-            }
-
-            Optional<Mensagem> first = resultados.stream().findFirst();
-
-            return first;
-        } catch (Exception e) {
-            return null;
-        }
-    }
-
-    public Optional<Mensagem> update(Mensagem mensagem, String table) {
-        Mensagem retorno = new Mensagem();
-        LocalDateTime time = LocalDateTime.now();
-
-        try {
-            connection = connect();
-
-            switch (table) {
-                case "servidor_mestre":
-                    preparedStatement = connection.prepareStatement("update servidor_mestre set value=?, timestamp=? WHERE key=?");
-                    break;
-                case "servidor_um":
-                    preparedStatement = connection.prepareStatement("insert into servidor_um (key, value, timestamp) values(?,?,?)");
-                    break;
-                case "servido_dois":
-                    preparedStatement = connection.prepareStatement("insert into servidor_dois (key, value, timestamp) values(?,?,?)");
-                    break;
-            }
-
-            preparedStatement.setString(1, mensagem.getValue());
-            preparedStatement.setTimestamp(2, Timestamp.valueOf(time));
-            preparedStatement.setString(3, mensagem.getKey());
-            preparedStatement.executeUpdate();
-
-
-            switch (table) {
-                case "servidor_mestre":
-                    preparedStatement = connection.prepareStatement("select * from servidor_mestre where key=?");
-                    break;
-                case "servidor_um":
-                    preparedStatement = connection.prepareStatement("select * from servidor_um where key=?");
-                    break;
-                case "servidor_dois":
-                    preparedStatement = connection.prepareStatement("select * from servidor_dois where key=?");
-                    break;
-            }
-
-            preparedStatement.setString(1, mensagem.getKey());
-            ResultSet resultSet = preparedStatement.executeQuery();
-
-            List<Mensagem> resultados = new ArrayList<>();
-
-            while(resultSet.next()) {
-                retorno.setKey(resultSet.getString("key"));
-                retorno.setValue(resultSet.getString("value"));
-                retorno.setIpServerMaster(mensagem.getIpServerMaster());
-                retorno.setPortServerMaster(mensagem.getPortServerMaster());
-                retorno.setIpServerOne(mensagem.getIpServerOne());
-                retorno.setPortServerOne(mensagem.getPortServerOne());
-                retorno.setIpServerTwo(mensagem.getIpServerTwo());
-                retorno.setPortServerTwo(mensagem.getPortServerTwo());
-                retorno.setIpFrom(mensagem.getIpFrom());
-                retorno.setPortFrom(mensagem.getPortFrom());
-                retorno.setTimestampClient(mensagem.getTimestampClient());
-                retorno.setTimestampServer(resultSet.getTimestamp("timestamp").toLocalDateTime());
-                retorno.setStatus("PUT_OK");
-
-                resultados.add(retorno);
-            }
-
-            Optional<Mensagem> first = resultados.stream().findFirst();
-
-            return first;
-        } catch (SQLException e) {
-            return null;
-        }
-    }
-
-    public void insertLocal(Mensagem mensagem, String table) {
-        try{
-            connection = connect();
-
-            if (table.equals("servidor_um")) {
-                preparedStatement = connection.prepareStatement("insert into servidor_um (key, value, timestamp) values(?,?,?)");
-            } else if (table.equals("servido_dois")){
-                preparedStatement = connection.prepareStatement("insert into servidor_dois (key, value, timestamp) values(?,?,?)");
-            }
-
-            preparedStatement.setString(1, mensagem.getKey());
-            preparedStatement.setString(2, mensagem.getValue());
-            preparedStatement.setTimestamp(3, Timestamp.valueOf(mensagem.getTimestampServer()));
-            preparedStatement.executeUpdate();
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
+    private ResultSet resultSet;
 
     private Connection connect() {
         Connection connection = null;
@@ -222,5 +23,195 @@ public class ServicesDatabase {
         }
 
         return connection;
+    }
+
+    public Optional<Mensagem> get(Mensagem mensagem, String table) {
+        Mensagem response = new Mensagem();
+
+        try {
+            switch (table) {
+                case "servidor_mestre":
+                    preparedStatement = connect().prepareStatement("select * from servidor_mestre where key=?");
+                    break;
+                case "servidor_um":
+                    preparedStatement = connect().prepareStatement("select * from servidor_um where key=?");
+                    break;
+                case "servidor_dois":
+                    preparedStatement = connect().prepareStatement("select * from servidor_dois where key=?");
+                    break;
+            }
+
+            preparedStatement.setString(1, mensagem.getKey());
+            resultSet = preparedStatement.executeQuery();
+
+            List<Mensagem> resultados = new ArrayList<>();
+
+            while(resultSet.next()){
+                response.setKey(resultSet.getString("key"));
+                response.setValue(resultSet.getString("value"));
+                response.setIpFrom(mensagem.getIpFrom());
+                response.setPortFrom(mensagem.getPortFrom());
+                response.setIpServerMaster(mensagem.getIpServerMaster());
+                response.setPortServerMaster(mensagem.getPortServerMaster());
+                response.setIpServerOne(mensagem.getIpServerOne());
+                response.setPortServerOne(mensagem.getPortServerOne());
+                response.setIpServerTwo(mensagem.getIpServerTwo());
+                response.setPortServerTwo(mensagem.getPortServerTwo());
+                response.setTimestampClient(mensagem.getTimestampClient());
+                response.setTimestampServer(resultSet.getTimestamp("timestamp").toLocalDateTime());
+
+                resultados.add(response);
+            }
+
+            Optional<Mensagem> first = resultados.stream().findFirst();
+
+            return first;
+
+        } catch (SQLException e) {
+            return Optional.empty();
+        }
+    }
+
+    public Optional<Mensagem> create(Mensagem mensagem, String table) {
+        Mensagem response = new Mensagem();
+        LocalDateTime time = LocalDateTime.now();
+
+        try{
+            if(table.equals("servidor_mestre")){
+                preparedStatement = connect().prepareStatement("insert into servidor_mestre (key, value, timestamp) values(?,?,?)");
+            } else if (table.equals("servidor_um")) {
+                preparedStatement = connect().prepareStatement("insert into servidor_um (key, value, timestamp) values(?,?,?)");
+            } else if (table.equals("servido_dois")){
+                preparedStatement = connect().prepareStatement("insert into servidor_dois (key, value, timestamp) values(?,?,?)");
+            }
+
+            preparedStatement.setString(1, mensagem.getKey());
+            preparedStatement.setString(2, mensagem.getValue());
+            preparedStatement.setTimestamp(3, Timestamp.valueOf(time));
+            preparedStatement.executeUpdate();
+
+            switch (table) {
+                case "servidor_mestre":
+                    preparedStatement = connect().prepareStatement("select * from servidor_mestre where key=?");
+                    break;
+                case "servidor_um":
+                    preparedStatement = connect().prepareStatement("select * from servidor_um where key=?");
+                    break;
+                case "servidor_dois":
+                    preparedStatement = connect().prepareStatement("select * from servidor_dois where key=?");
+                    break;
+            }
+
+            preparedStatement.setString(1, mensagem.getKey());
+            resultSet = preparedStatement.executeQuery();
+
+            List<Mensagem> resultados = new ArrayList<>();
+
+            while(resultSet.next()) {
+                response.setKey(resultSet.getString("key"));
+                response.setValue(resultSet.getString("value"));
+                response.setTimestampServer(resultSet.getTimestamp("timestamp").toLocalDateTime());
+                response.setIpServerMaster(mensagem.getIpServerMaster());
+                response.setPortServerMaster(mensagem.getPortServerMaster());
+                response.setIpServerOne(mensagem.getIpServerOne());
+                response.setPortServerOne(mensagem.getPortServerOne());
+                response.setIpServerTwo(mensagem.getIpServerTwo());
+                response.setPortServerTwo(mensagem.getPortServerTwo());
+                response.setIpFrom(mensagem.getIpFrom());
+                response.setPortFrom(mensagem.getPortFrom());
+                response.setStatus("PUT_OK");
+
+                resultados.add(response);
+            }
+
+            Optional<Mensagem> first = resultados.stream().findFirst();
+
+            return first;
+        } catch (Exception e) {
+            return Optional.empty();
+        }
+    }
+
+    public Optional<Mensagem> update(Mensagem mensagem, String table) {
+        Mensagem response = new Mensagem();
+        LocalDateTime time = LocalDateTime.now();
+
+        try {
+            switch (table) {
+                case "servidor_mestre":
+                    preparedStatement = connect().prepareStatement("update servidor_mestre set value=?, timestamp=? WHERE key=?");
+                    break;
+                case "servidor_um":
+                    preparedStatement = connect().prepareStatement("insert into servidor_um (key, value, timestamp) values(?,?,?)");
+                    break;
+                case "servido_dois":
+                    preparedStatement = connect().prepareStatement("insert into servidor_dois (key, value, timestamp) values(?,?,?)");
+                    break;
+            }
+
+            preparedStatement.setString(1, mensagem.getValue());
+            preparedStatement.setTimestamp(2, Timestamp.valueOf(time));
+            preparedStatement.setString(3, mensagem.getKey());
+            preparedStatement.executeUpdate();
+
+            switch (table) {
+                case "servidor_mestre":
+                    preparedStatement = connect().prepareStatement("select * from servidor_mestre where key=?");
+                    break;
+                case "servidor_um":
+                    preparedStatement = connect().prepareStatement("select * from servidor_um where key=?");
+                    break;
+                case "servidor_dois":
+                    preparedStatement = connect().prepareStatement("select * from servidor_dois where key=?");
+                    break;
+            }
+
+            preparedStatement.setString(1, mensagem.getKey());
+            resultSet = preparedStatement.executeQuery();
+
+            List<Mensagem> resultados = new ArrayList<>();
+
+            while(resultSet.next()) {
+                response.setKey(resultSet.getString("key"));
+                response.setValue(resultSet.getString("value"));
+                response.setIpServerMaster(mensagem.getIpServerMaster());
+                response.setPortServerMaster(mensagem.getPortServerMaster());
+                response.setIpServerOne(mensagem.getIpServerOne());
+                response.setPortServerOne(mensagem.getPortServerOne());
+                response.setIpServerTwo(mensagem.getIpServerTwo());
+                response.setPortServerTwo(mensagem.getPortServerTwo());
+                response.setIpFrom(mensagem.getIpFrom());
+                response.setPortFrom(mensagem.getPortFrom());
+                response.setTimestampClient(mensagem.getTimestampClient());
+                response.setTimestampServer(resultSet.getTimestamp("timestamp").toLocalDateTime());
+                response.setStatus("PUT_OK");
+
+                resultados.add(response);
+            }
+
+            Optional<Mensagem> first = resultados.stream().findFirst();
+
+            return first;
+        } catch (SQLException e) {
+            return Optional.empty();
+        }
+    }
+
+    public void insertLocal(Mensagem mensagem, String table) {
+        try{
+            if (table.equals("servidor_um")) {
+                preparedStatement = connect().prepareStatement("insert into servidor_um (key, value, timestamp) values(?,?,?)");
+            } else if (table.equals("servido_dois")){
+                preparedStatement = connect().prepareStatement("insert into servidor_dois (key, value, timestamp) values(?,?,?)");
+            }
+
+            preparedStatement.setString(1, mensagem.getKey());
+            preparedStatement.setString(2, mensagem.getValue());
+            preparedStatement.setTimestamp(3, Timestamp.valueOf(mensagem.getTimestampServer()));
+            preparedStatement.executeUpdate();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

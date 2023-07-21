@@ -63,15 +63,21 @@ public class ThreadServidorUm implements Runnable {
 
                     sendBack(response);
 
+                    mensagem.setRequest("REPLICATION_OK");
+                    response = sendToServerMaster(mensagem);
+
                     break;
                 case "REPLICATION":
-                    System.out.println("Replication OK");
+                    System.out.println(
+                            "REPLICATION key:" + mensagem.getKey()
+                                    + " value:" + mensagem.getValue()
+                                    + " ts:" + mensagem.getTimestampServer()
+                    );
+
                     insertLocal(mensagem);
 
                     mensagem.setRequest("REPLICATION_OK");
-
                     sendBack(mensagem);
-
                     break;
             }
         } catch (IOException | ClassNotFoundException ex) {
