@@ -9,18 +9,18 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.Optional;
 
-//  Essa é a thread do servidor UM.
+//  Essa é a thread do servidor DOIS.
 //  Quando é inicializada, ela recebe o socket e a mensagem.
 //  Dentro da mensagem, existe o conteúdo referente a qual o tipo de requisição que esta chegando, podendo ser um GET ou um PUT (quando é o Cliente que chama o servidor),
 //  ou um REPLICATION (quando o servidor mestre replicar a informação para os demais servidores).
-public class ThreadServidorUm implements Runnable {
+public class ThreadServidorDois implements Runnable {
     private final Socket socket;
-    private final String tableOne = "servidor_um";
+    private final String tableTwo = "servidor_dois";
     private Mensagem mensagem;
     private Mensagem response;
     private Optional<Mensagem> optionalResponse;
 
-    public ThreadServidorUm(Socket socket, Mensagem mensagem){
+    public ThreadServidorDois(Socket socket, Mensagem mensagem){
         this.mensagem = mensagem;
         this.socket = socket;
     }
@@ -61,15 +61,13 @@ public class ThreadServidorUm implements Runnable {
                     );
 
                     mensagem.setRequest("REPLICATION");
-
                     response = sendToServerMaster(mensagem);
 
                     sendBack(response);
                     break;
-
-//              Caso a opção seja um REPLICATION, isso significa que o servidor um está recebendo uma replicação do servidor mestre.
+//              Caso a opção seja um REPLICATION, isso significa que o servidor dois está recebendo uma replicação do servidor mestre.
 //              Dessa forma, ele primeiro exibe na console que está recebendo uma replication com as informações contidas na mensagem.
-//              Depois guardar a informação na tabela local através do "insertLocal()" (essa tabela é referente ao servidor um).
+//              Depois guardar a informação na tabela local através do "insertLocal()" (essa tabela é referente ao servidor dois).
 //              E por fim, envia para o servidor mestre que a replicação funcionou (REPLICATION_OK).
                 case "REPLICATION":
                     System.out.println(
@@ -89,18 +87,17 @@ public class ThreadServidorUm implements Runnable {
         }
     }
 
-//  Aqui temos o método get(), no qual realiza a busca da chave no banco de dados do servidor um.
+//  Aqui temos o método get(), no qual realiza a busca da chave no banco de dados do servidor dois.
 //  Ela funciona por meio de uma conexão com um banco de dados, que é estabelecida pelo serviço ServiceDatabase.
 //  Nesse serviço, existem os métodos de get, put e update que o serviço disponibiliza para os servidores.
 //  Junto a isso, depois de executar as ações com o banco, é verificado na mensagem o timestamp.
 //  Aqui temos a lógica de validar o timestamp que veio do servidor e o que o cliente enviou.
 //  Se o timestamp do servidor for maior ou igual ao timestamp do cliente, é setado na mensagem o status "OK".
-//  Caso contrário, é setado na mensagem o status "TRY_OTHER_SERVER_OR_LATER"
     private Optional<Mensagem> get(Mensagem mensagem) {
         try{
             ServicesDatabase servicesDatabase = new ServicesDatabase();
 
-            Optional<Mensagem> response = servicesDatabase.get(mensagem, tableOne);
+            Optional<Mensagem> response = servicesDatabase.get(mensagem, tableTwo);
 
             if(response.get().getTimestampServer().isAfter(response.get().getTimestampClient()) ||
                     response.get().getTimestampServer().isEqual(response.get().getTimestampClient())) {
@@ -116,20 +113,20 @@ public class ThreadServidorUm implements Runnable {
     }
 
 //  Aqui temos o método insertLocal. Ele funciona através dos serviços do ServiceDatabase.
-//  Aqui ocorre o insert da informação repassada pelo replication do servidor mestre na própria tabela do servidor um.
+//  Aqui ocorre o insert da informação repassada pelo replication do servidor mestre na própria tabela do servidor dois.
 //  Ele primeiro busca se existe a chave. Se existir, ele atualiza os dados. Se não, cria um novo registro.
     private void insertLocal(Mensagem mensagem){
-        Optional<Mensagem> findRegistry;
-
         try{
+            Optional<Mensagem> findRegistry;
+
             ServicesDatabase servicesDatabase = new ServicesDatabase();
 
-            findRegistry = servicesDatabase.get(mensagem, tableOne);
+            findRegistry = servicesDatabase.get(mensagem, tableTwo);
 
             if(!findRegistry.isPresent()){
-                servicesDatabase.create(mensagem, tableOne);
+                servicesDatabase.create(mensagem, tableTwo);
             } else {
-                servicesDatabase.update(mensagem, tableOne);
+                servicesDatabase.update(mensagem, tableTwo);
             }
         } catch(Exception e){
             e.printStackTrace();

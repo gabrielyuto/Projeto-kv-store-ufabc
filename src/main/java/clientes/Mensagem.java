@@ -3,6 +3,7 @@ package clientes;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
+//  Aqui temos a mensagem que trafega durante toda a comunicação entre cliente e servidores, junto aos métodos Getters e Setters dos atributos da classe.
 public class Mensagem implements Serializable {
     private String request;
     private String key;

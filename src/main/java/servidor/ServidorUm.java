@@ -9,6 +9,10 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Scanner;
 
+//  Aqui temos a inicialização do servidor UM.
+//  Em um primeiro momento, o servidor precisa das informações sobre qual o seu IP e PORTA e quais os mesmos lados do servidor mestre para que consiga se comunicar.
+//  Após isso, através de um ServerSocket, o servidor entra num loop para atender as requisições que chegam até o mesmo.
+//  Quando recebe uma chamada, ele cria uma thread para tratar da requisição.
 public class ServidorUm {
     public static void main(String[] args) throws IOException {
         Scanner scanner = new Scanner(System.in);

@@ -8,10 +8,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+//  Aqui temos todos os serviços para que os servidores consigam se comunicar com o banco de dados.
 public class ServicesDatabase {
     private PreparedStatement preparedStatement;
     private ResultSet resultSet;
 
+//  Antes de criar a querie, este método é chamado por cada um dos serviços desse service. Ele estabelece a comunicação com o banco de dados.
     private Connection connect() {
         Connection connection = null;
 
@@ -25,6 +27,9 @@ public class ServicesDatabase {
         return connection;
     }
 
+//  Aqui temos o método get, que irá busca a chave no banco.
+//  Para preparar a querie, primeiro é definido qual o servidor que está chamando o serviço. A depender, é preparado uma querie distinta que atenda a requisição (servidor_mestre, servidor_um, servidor_dois).
+//  Depois de preparada, a querie é executada e o seu retorno é devolvido para o servidor.
     public Optional<Mensagem> get(Mensagem mensagem, String table) {
         Mensagem response = new Mensagem();
 
@@ -72,6 +77,9 @@ public class ServicesDatabase {
         }
     }
 
+//  Aqui temos o método responsável por criar um novo registro no banco.
+//  Para preparar a querie, primeiro é definido qual o servidor que está chamando o serviço. A depender, é preparado uma querie distinta que atenda a requisição (servidor_mestre, servidor_um, servidor_dois).
+//  Depois de preparada, a querie é executada e o seu retorno é devolvido para o servidor.
     public Optional<Mensagem> create(Mensagem mensagem, String table) {
         Mensagem response = new Mensagem();
         LocalDateTime time = LocalDateTime.now();
@@ -81,7 +89,7 @@ public class ServicesDatabase {
                 preparedStatement = connect().prepareStatement("insert into servidor_mestre (key, value, timestamp) values(?,?,?)");
             } else if (table.equals("servidor_um")) {
                 preparedStatement = connect().prepareStatement("insert into servidor_um (key, value, timestamp) values(?,?,?)");
-            } else if (table.equals("servido_dois")){
+            } else if (table.equals("servidor_dois")){
                 preparedStatement = connect().prepareStatement("insert into servidor_dois (key, value, timestamp) values(?,?,?)");
             }
 
@@ -111,6 +119,8 @@ public class ServicesDatabase {
                 response.setKey(resultSet.getString("key"));
                 response.setValue(resultSet.getString("value"));
                 response.setTimestampServer(resultSet.getTimestamp("timestamp").toLocalDateTime());
+                response.setIpServerClientRequest(mensagem.getIpServerClientRequest());
+                response.setPortServerClientRequest(mensagem.getPortServerClientRequest());
                 response.setIpServerMaster(mensagem.getIpServerMaster());
                 response.setPortServerMaster(mensagem.getPortServerMaster());
                 response.setIpServerOne(mensagem.getIpServerOne());
@@ -132,6 +142,10 @@ public class ServicesDatabase {
         }
     }
 
+
+//  Aqui temos o método responsável por atualizar um novo registro no banco.
+//  Para preparar a querie, primeiro é definido qual o servidor que está chamando o serviço. A depender, é preparado uma querie distinta que atenda a requisição (servidor_mestre, servidor_um, servidor_dois).
+//  Depois de preparada, a querie é executada e o seu retorno é devolvido para o servidor.
     public Optional<Mensagem> update(Mensagem mensagem, String table) {
         Mensagem response = new Mensagem();
         LocalDateTime time = LocalDateTime.now();
@@ -142,10 +156,10 @@ public class ServicesDatabase {
                     preparedStatement = connect().prepareStatement("update servidor_mestre set value=?, timestamp=? WHERE key=?");
                     break;
                 case "servidor_um":
-                    preparedStatement = connect().prepareStatement("insert into servidor_um (key, value, timestamp) values(?,?,?)");
+                    preparedStatement = connect().prepareStatement("update servidor_um set value=?, timestamp=? WHERE key=?");
                     break;
-                case "servido_dois":
-                    preparedStatement = connect().prepareStatement("insert into servidor_dois (key, value, timestamp) values(?,?,?)");
+                case "servidor_dois":
+                    preparedStatement = connect().prepareStatement("update servidor_dois set value=?, timestamp=? WHERE key=?");
                     break;
             }
 
@@ -174,6 +188,8 @@ public class ServicesDatabase {
             while(resultSet.next()) {
                 response.setKey(resultSet.getString("key"));
                 response.setValue(resultSet.getString("value"));
+                response.setIpServerClientRequest(mensagem.getIpServerClientRequest());
+                response.setPortServerClientRequest(mensagem.getPortServerClientRequest());
                 response.setIpServerMaster(mensagem.getIpServerMaster());
                 response.setPortServerMaster(mensagem.getPortServerMaster());
                 response.setIpServerOne(mensagem.getIpServerOne());
@@ -194,24 +210,6 @@ public class ServicesDatabase {
             return first;
         } catch (SQLException e) {
             return Optional.empty();
-        }
-    }
-
-    public void insertLocal(Mensagem mensagem, String table) {
-        try{
-            if (table.equals("servidor_um")) {
-                preparedStatement = connect().prepareStatement("insert into servidor_um (key, value, timestamp) values(?,?,?)");
-            } else if (table.equals("servido_dois")){
-                preparedStatement = connect().prepareStatement("insert into servidor_dois (key, value, timestamp) values(?,?,?)");
-            }
-
-            preparedStatement.setString(1, mensagem.getKey());
-            preparedStatement.setString(2, mensagem.getValue());
-            preparedStatement.setTimestamp(3, Timestamp.valueOf(mensagem.getTimestampServer()));
-            preparedStatement.executeUpdate();
-
-        } catch (Exception e) {
-            e.printStackTrace();
         }
     }
 }

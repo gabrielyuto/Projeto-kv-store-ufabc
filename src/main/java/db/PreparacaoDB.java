@@ -4,6 +4,9 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.Statement;
 
+//  Aqui ocorre apenas a criação das tabelas no banco de dados.
+//  Vale ressaltar que para o banco, esta sendo utilizado o docker, que cria um container para subir um banco PostgreSQL.
+//  Por isso, antes de executar a criação, é preciso que o docker crie o banco. Para isso, o docker precisa estar instalado e é necessário somente executar o comando na console "docker-compose up -d".
 public class PreparacaoDB {
     public static void main(String[] args) {
         Connection connection;
