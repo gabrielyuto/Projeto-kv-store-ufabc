@@ -146,9 +146,9 @@ public class ThreadServidorMestre implements Runnable {
             response = servicesDatabase.get(mensagem, table);
 
             if(response.get().getTimestampServer().isAfter(response.get().getTimestampClient()) || response.get().getTimestampServer().isEqual(response.get().getTimestampClient())) {
-                response.get().setStatus("TRY_OTHER_SERVER_OR_LATER");
-            } else {
                 response.get().setStatus("OK");
+            } else {
+                response.get().setStatus("TRY_OTHER_SERVER_OR_LATER");
             }
 
             return response;
