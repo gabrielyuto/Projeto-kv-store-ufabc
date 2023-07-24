@@ -8,14 +8,14 @@ import java.util.Optional;
 import java.util.Random;
 import java.util.Scanner;
 
-// Aqui temos o cliente que será responsável por enviar as requisições para os servidores.
-// Inicialmente, o cliente precisa informar o IP e a PORTA dos três servidores.
+// Aqui temos o cliente dois que será responsável por enviar as requisições para os servidores.
+// Inicialmente, o cliente dois precisa informar o IP e a PORTA dos três servidores.
 // Depois de informar, é apresentado três opções de ação: INIT (1), GET (2) e PUT (3).
-// No caso, antes de realizar as requisições, o cliente precisa inicializar o client (1- INIT), no qual é definido o destino da requisição. Nesta etapa, é importante
+// No caso, antes de realizar as requisições, o cliente dois precisa inicializar (1- INIT), no qual é definido o destino da requisição. Nesta etapa, é importante
 // destacar que o cliente não saberá para qual IP e PORTA esta solicitando a requisição (o valor é escolhido randomicamente).
 // Depois de inicializar, o cliente pode solicitar a busca por um valor, inserindo a chave.
 // Ou pode incluir um valor no servidor, solicitando pelo método PUT e inserindo qual a KEY e VALUE.
-public class Cliente {
+public class ClienteDois {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
         Mensagem mensagem = new Mensagem();
@@ -42,7 +42,7 @@ public class Cliente {
         String[] ips = {ip1,ip2, ip3};
         int[] ports = {port1,port2, port3};
 
-//      Aqui é construído um loop para expor um painel com as informações sobre as três possibildades mencioandas anteriormente.
+//      Aqui é construído um loop para expor um painel com as informações sobre as três possibildades mencionadas anteriormente.
         while(true) {
             System.out.println("1-INIT | 2-GET | 3-PUT");
             menu_choice = scanner.nextInt();
@@ -129,7 +129,7 @@ public class Cliente {
     }
 
 //  Este método é chamado durante os momentos em que são realizados os GETs e PUTs.
-//  Ele serve como a comunicação TCP que o cliente faz com os servidores utilizando os sockets, e depois de receber a informação do servidor, retorna a mensagem recebida.
+//  Ele serve como a comunicação TCP que o cliente dois faz com os servidores utilizando os sockets, e depois de receber a informação do servidor, retorna a mensagem recebida.
     private static Optional<Mensagem> requestToServer(Mensagem mensagem){
         try{
             Socket socket = new Socket(mensagem.getIpServerClientRequest(), mensagem.getPortServerClientRequest());
