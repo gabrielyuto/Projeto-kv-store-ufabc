@@ -1,4 +1,4 @@
-package clientes;
+import mensagem.Mensagem;
 
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;

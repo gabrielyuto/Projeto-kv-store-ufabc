@@ -1,4 +1,4 @@
-package clientes;
+package mensagem;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -11,8 +11,6 @@ public class Mensagem implements Serializable {
     private String status;
     private LocalDateTime timestampServer;
     private LocalDateTime timestampClient;
-    private String table;
-    private String replication;
     private String ipFrom;
     private String ipServerClientRequest;
     private String ipServerMaster;
@@ -70,22 +68,6 @@ public class Mensagem implements Serializable {
 
     public void setTimestampClient(LocalDateTime timestampClient) {
         this.timestampClient = timestampClient;
-    }
-
-    public String getTable() {
-        return table;
-    }
-
-    public void setTable(String table) {
-        this.table = table;
-    }
-
-    public String getReplication() {
-        return replication;
-    }
-
-    public void setReplication(String replication) {
-        this.replication = replication;
     }
 
     public String getIpFrom() {

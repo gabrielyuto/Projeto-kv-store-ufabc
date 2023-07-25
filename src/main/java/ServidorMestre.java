@@ -1,6 +1,4 @@
-package servidor;
-
-import clientes.Mensagem;
+import mensagem.Mensagem;
 import thread.ThreadServidorMestre;
 
 import java.io.IOException;

@@ -1,6 +1,6 @@
 package db;
 
-import clientes.Mensagem;
+import mensagem.Mensagem;
 
 import java.sql.*;
 import java.time.LocalDateTime;

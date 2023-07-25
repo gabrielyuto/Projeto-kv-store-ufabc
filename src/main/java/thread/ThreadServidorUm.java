@@ -1,6 +1,6 @@
 package thread;
 
-import clientes.Mensagem;
+import mensagem.Mensagem;
 import db.ServicesDatabase;
 
 import java.io.IOException;
